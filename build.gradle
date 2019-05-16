@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+group 'com.logonlabs'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+// https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient
+
+
+
+dependencies {
+    implementation 'com.squareup.okhttp3:okhttp:3.14.0'
+    implementation 'net.servicestack:client:1.0.35'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.12'
+    compile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
+}
