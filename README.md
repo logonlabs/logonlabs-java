@@ -1,10 +1,8 @@
 # LogonLabs Java
----
 The official LogonLabs Java Client library.
 
 ## Download
----
-Maven
+### Maven
 ```xml
 <dependency>
     <groupId>com.logonlabs</groupId>
@@ -14,7 +12,6 @@ Maven
 ```
 
 ## Logon Labs API
----
 For the full Developer Documentation please visit: https://logonlabs.com/docs/api
 
 ---
