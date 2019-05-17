@@ -8,7 +8,7 @@ Maven
 ```xml
 <dependency>
     <groupId>com.logonlabs</groupId>
-    <artifactId>logonlabs</artifactId>
+    <artifactId>logonlabs-java</artifactId>
     <version>1.0</version>
 </dependency>
 ```
