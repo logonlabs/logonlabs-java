@@ -1,26 +1,34 @@
 # LogonLabs Java
+
 The official LogonLabs Java Client library.
 
 ## Download
-### Maven
+
+Maven
 ```xml
 <dependency>
     <groupId>com.logonlabs</groupId>
-    <artifactId>logonlabs-java</artifactId>
+    <artifactId>logonlabs</artifactId>
     <version>1.0</version>
 </dependency>
 ```
 
-## Logon Labs API
-For the full Developer Documentation please visit: https://logonlabs.com/docs/api
+## LogonLabs API
+
+
+- Prior to coding, some configuration is required at https://logonlabs.com/app/#/app-settings.
+
+- For the full Developer Documentation please visit: https://logonlabs.com/docs/api/
 
 ---
 ### Instantiating a new client
 
+- Your `APP_ID` can be found in [App Settings](https://logonlabs.com/app/#/app-settings)
+- `APP_SECRETS` are configured [here](https://logonlabs.com/app/#/app-secrets)
+- The `LOGONLABS_API_ENDPOINT` should be set to `https://api.logonlabs.com`
+
 Create a new instance of `LogonClient`.  
-Your `APP_ID` can be found in [App Settings](https://logonlabs.com/app/#/app-settings).
-`APP_SECRETS` are configured [here](https://logonlabs.com/app/#/app-secrets).
-The `LOGONLABS_API_ENDPOINT` should be set to `https://api.logonlabs.com`.
+
 ```java
 import com.logonlabs.LogonClient;
 
@@ -29,7 +37,7 @@ LogonClient client = new LogonClient("{APP_ID}", "{APP_SECRET}", "{LOGONLABS_API
 ---
 ### SSO Login QuickStart
 
-The StartLogin function in the JS library begins the Logon Labs managed SSO process.  Configuration is required at https://logonlabs.com/app/#app-settings.  Once the `Callback Url` has been configured for your application you can consume the payload sent to your page.
+The StartLogin function in the JS library begins the LogonLabs managed SSO process.
 
 >Further documentation on starting the login process via our JavaScript client can be found at our GitHub page [here](https://github.com/logonlabs/logonlabs-js)
 
@@ -56,9 +64,9 @@ if(response.isEventSuccess()) {
 ```
 ---
 ### Java Only Workflow
-The following workflow is required if you're using a java framework that handles both the front and back ends.  If this does not apply to you please refer to the SSO Login QuickStart section.
+The following workflow is required if you're using a java framework that handles both the front and back ends.  If this does not apply to you, please refer to the SSO Login QuickStart section.
 #### Step 1 - StartLogin
-This call begins the Logon Labs managed SSO process.  The `clientData` property is optional and is used to pass any data that is required after validating the request.  The `clientEncryptionKey` property is optionally passed if the application requires encrypting any data that is passed between the front and back ends of it's infrastructure. The `tags`property is an ArrayList of type Tag which is a simple object representing a key/value pair.
+This call begins the LogonLabs managed SSO process.  The `clientData` property is optional and is used to pass any data that is required after validating the request.  The `clientEncryptionKey` property is optionally passed if the application requires encrypting any data that is passed between the front and back end infrastructure. The `tags`property is an ArrayList of type Tag which is a simple object representing a key/value pair.
 
 ```java
 import com.logonlabs.LogonClient;
@@ -77,12 +85,12 @@ tags.Add(tag);
 
 String redirectUri = client.startLogin(IdentityProviders.Google, "emailAddress", clientData, clientEncryptionKey, tags);
 ```
-The `redirectUri` property returned should be redirected to by the application.  Upon the user completing entering their credentials they will be redirected to the `CallbackUrl` set within the application settings at https://logonlabs.com/app/#/app-settings.
+The `redirectUri` property returned should be redirected to by the application.  Upon submitting their credentials, users will be redirected to the `CallbackUrl` set within the application settings at https://logonlabs.com/app/#/app-settings.
 &nbsp;
 #### Step 2 - ValidateLogin
 This method is used to validate the results of the login attempt.  `queryToken` corresponds to the query parameter with the name `token` appended to the callback url specified for your app.
 
-The response contains all details of the login and the user has now completed the SSO workflow.  If there is any additional information to add UpdateEvent can be called on the `eventId` returned.
+The response contains all details of the login and the user has now completed the SSO workflow.  If there is any additional information to add, UpdateEvent can be called on the `eventId` returned.
 ```java
 import com.logonlabs.LogonClient;
 import com.logonlabs.dtos.ValidateLoginResponse;
@@ -156,7 +164,7 @@ client.updateEvent(eventId, localValidation, tags);
 ### Helper Methods
 #### GetProviders
 This method is used to retrieve a list of all providers enabled for the application.
-If an email address is passed to the method it will further filter any providers available/disabled for the domain of the address.
+If an email address is passed to the method, it will return the list of providers available for that email domain.
 ```java
 import com.logonlabs.LogonClient;
 import com.logonlabs.dtos.GetProvidersResponse;
@@ -174,7 +182,7 @@ for(Provider provider : response.identity_providers) {
 ```
 
 #### Encrypt/Decrypt
-The Java SDK has built in methods for encrypting/decrypting strings using the AES encryption standard.  Use a value for your encryption key that only your client/server will know and 
+The Java SDK has built in methods for encrypting/decrypting strings using AES encryption.  Use a value for your encryption key that only your client/server will know. 
 ```java
 import com.logonlabs.LogonClient;
 
