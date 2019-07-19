@@ -165,6 +165,8 @@ client.updateEvent(eventId, localValidation, tags);
 #### GetProviders
 This method is used to retrieve a list of all providers enabled for the application.
 If an email address is passed to the method, it will return the list of providers available for that email domain.
+If any Enterprise Identity Providers have been configured a separate set of matching providers will also be returned in enterprise_identity_providers.
+
 ```java
 import com.logonlabs.LogonClient;
 import com.logonlabs.dtos.GetProvidersResponse;
@@ -179,6 +181,10 @@ for(Provider provider : response.identity_providers) {
         //make google available in UI or handle other custom rules
     }
 }
+
+for(EnterpriseProvider provider : response.enterprise_identity_providers) {
+        //use the identity_provider_id to find the correct provider and apply any custom rules
+    }
 ```
 
 #### Encrypt/Decrypt

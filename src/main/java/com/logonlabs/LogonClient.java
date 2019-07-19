@@ -121,7 +121,8 @@ public class LogonClient {
 
     /**
      * Request that begins the SSO login process
-     * @param identityProvider      the name of the identity provider. a list of valid strings is provided in IdentityProviders
+     * @param identityProvider      the name of the identity provider. a list of valid strings is provided in IdentityProviders. if this is passed then identityProviderId must be null
+     * @param identityProviderId    the unique identifier for the identity provider. if this is passed then identityProvider parameter must be null
      * @param emailAddress          required if matching the email against the one returned by the identity provider
      * @param clientData            any custom data required by your application.  will be present in client_data of the ValidateLoginResponse
      * @param clientEncryptionKey   optional key client/server can set to encrypt/decrypt sensitive information passed between the two
@@ -129,18 +130,25 @@ public class LogonClient {
      * @return                      token to pass to validateLogin in order to continue the current SSO login process
      * @throws LogonLabsException   thrown in case of API error
      */
-    public String startLogin(String identityProvider, String emailAddress, String clientData, String clientEncryptionKey, ArrayList<dtos.Tag> tags) throws LogonLabsException {
+    public String startLogin(String identityProvider, String identityProviderId, String emailAddress, String clientData, String clientEncryptionKey, ArrayList<dtos.Tag> tags) throws LogonLabsException {
         try {
 
             dtos.StartLogin request = new dtos.StartLogin();
 
             request.setAppId(appId);
 
-            if(identityProvider == null || identityProvider.isEmpty()) {
-                throw new IllegalArgumentException("identityProvider must have value");
+            if((identityProvider == null || identityProvider.isEmpty()) &&
+                    (identityProviderId == null || identityProviderId.isEmpty())) {
+                throw new IllegalArgumentException("identityProvider and identityProviderId cannot both be null");
+            }
+
+            if((identityProvider != null || !identityProvider.isEmpty()) &&
+                    (identityProviderId != null || !identityProviderId.isEmpty())) {
+                throw new IllegalArgumentException("identityProvider and identityProviderId cannot both have a value");
             }
 
             request.setIdentityProvider(identityProvider);
+            request.setIdentityProviderId(identityProviderId);
             request.setEmailAddress(emailAddress);
             request.setClientData(clientData);
             request.setClientEncryptionKey(clientEncryptionKey);

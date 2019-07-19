@@ -9,4 +9,8 @@ public class IdentityProviders {
     public static final String Facebook = "facebook";
     public static final String LinkedIn = "linkedin";
     public static final String Okta = "okta";
+    public static final String Slack = "slack";
+    public static final String Quickbooks = "quickbooks";
+    public static final String Github = "github";
+    public static final String OneLogin = "onelogin";
 }

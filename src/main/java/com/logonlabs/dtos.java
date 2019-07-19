@@ -192,6 +192,9 @@ public class dtos
         public String identity_provider = null;
 
         @DataMember
+        public String identity_provider_id = null;
+
+        @DataMember
         public String email_address = null;
 
         @DataMember
@@ -207,6 +210,8 @@ public class dtos
         public StartLogin setAppId(String value) { this.app_id = value; return this; }
         public String getIdentityProvider() { return identity_provider; }
         public StartLogin setIdentityProvider(String value) { this.identity_provider = value; return this; }
+        public String getIdentityProviderId() { return identity_provider_id; }
+        public StartLogin setIdentityProviderId(String value) { this.identity_provider_id = value; return this; }
         public String getEmailAddress() { return email_address; }
         public StartLogin setEmailAddress(String value) { this.email_address = value; return this; }
         public String getClientData() { return client_data; }
@@ -320,12 +325,17 @@ public class dtos
         public ArrayList<Provider> identity_providers = null;
 
         @DataMember
+        public ArrayList<EnterpriseProvider> enterprise_identity_providers = null;
+
+        @DataMember
         public String suggested_identity_provider = null;
 
         public IErrorResponse error = null;
 
         public ArrayList<Provider> getIdentityProviders() { return identity_providers; }
         public GetProvidersResponse setIdentityProviders(ArrayList<Provider> value) { this.identity_providers = value; return this; }
+        public ArrayList<EnterpriseProvider> getEnterpriseIdentityProviders() { return enterprise_identity_providers; }
+        public GetProvidersResponse setEnterpriseIdentityProviders(ArrayList<EnterpriseProvider> value) { this.enterprise_identity_providers = value; return this; }
         public String getSuggestedIdentityProvider() { return suggested_identity_provider; }
         public GetProvidersResponse setSuggestedIdentityProvider(String value) { this.suggested_identity_provider = value; return this; }
         public IErrorResponse getError() { return error; }
@@ -509,6 +519,25 @@ public class dtos
 
         public String getType() { return type; }
         public Provider setType(String value) { this.type = value; return this; }
+    }
+
+    public static class EnterpriseProvider
+    {
+        @DataMember
+        public String name = null;
+
+        @DataMember
+        public String identity_provider_id = null;
+
+        @DataMember
+        public String type = null;
+
+        public String getName() { return name; }
+        public EnterpriseProvider setName(String value) { this.name = value; return this; }
+        public String getIdentityProviderId() { return identity_provider_id; }
+        public EnterpriseProvider setIdentityProviderId(String value) { this.identity_provider_id = value; return this; }
+        public String getType() { return type; }
+        public EnterpriseProvider setType(String value) { this.type = value; return this; }
     }
 
     public static class IdentityProviderData

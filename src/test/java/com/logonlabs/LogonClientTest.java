@@ -40,7 +40,7 @@ public class LogonClientTest {
 
         LogonClient client = new LogonClient(APP_ID, APP_SECRET, IDPX_URI);
 
-        String response = client.startLogin(IdentityProviders.Microsoft, "isiah.pasquale@deliveryslip.com", null, null, null);
+        String response = client.startLogin(IdentityProviders.Microsoft, null,"isiah.pasquale@deliveryslip.com", null, null, null);
         if(response == null || response.isEmpty()) {
             throw new Exception("failed to get uri");
         }
