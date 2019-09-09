@@ -18,7 +18,7 @@ Maven
 
 - Prior to coding, some configuration is required at https://app.logonlabs.com/app/#/app-settings.
 
-- For the full Developer Documentation please visit: https://app.logonlabs.com/docs/api/
+- For the full Developer Documentation please visit: https://app.logonlabs.com/api/
 
 ---
 ### Instantiating a new client
