@@ -1,10 +1,11 @@
+package com.logonlabs;
 /* Options:
-Date: 2019-03-29 17:40:21
-Version: 5.40
+Date: 2019-10-08 14:31:01
+Version: 5.60
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://idpx.logon-dev.com
+BaseUrl: https://local-idpx.logon-dev.com
 
-//Package: com.logonlabs
+//Package:
 //GlobalNamespace: dtos
 //AddPropertyAccessors: True
 //SettersReturnThis: True
@@ -18,26 +19,25 @@ BaseUrl: https://idpx.logon-dev.com
 //DefaultImports: java.math.*,java.util.*,net.servicestack.client.*
 */
 
-package com.logonlabs;
-
 import java.math.*;
 import java.util.*;
 import net.servicestack.client.*;
 
 public class dtos
 {
+
     @Route(Path="/callback", Verbs="GET")
     // @Route(Path="/callback", Verbs="POST")
     @DataContract
-    public static class Callback implements IReturn<CallbackResponse>
+    public static class Callback implements IReturn<String>
     {
-        @DataMember(IsRequired=true)
+        @DataMember
         public String code = null;
 
-        @DataMember(IsRequired=true)
+        @DataMember
         public String state = null;
 
-        @DataMember(IsRequired=true)
+        @DataMember
         public String session_state = null;
 
         @DataMember
@@ -66,11 +66,11 @@ public class dtos
         public Callback setOauthToken(String value) { this.oauth_token = value; return this; }
         public String getOauthVerifier() { return oauth_verifier; }
         public Callback setOauthVerifier(String value) { this.oauth_verifier = value; return this; }
-        private static Object responseType = CallbackResponse.class;
+        private static Object responseType = String.class;
         public Object getResponseType() { return responseType; }
     }
 
-    @Route(Path="/event", Verbs="POST")
+    @Route(Path="/events", Verbs="POST")
     @DataContract
     public static class CreateEvent implements IReturn<CreateEventResponse>, IAppId
     {
@@ -134,6 +134,92 @@ public class dtos
     {
 
         private static Object responseType = Object.class;
+        public Object getResponseType() { return responseType; }
+    }
+
+    @Route(Path="/events", Verbs="GET")
+    @DataContract
+    public static class GetEvents implements IReturn<GetEventsResponse>, IAppId
+    {
+        @DataMember(IsRequired=true)
+        @ApiMember(IsRequired=true, ParameterType="path")
+        public String app_id = null;
+
+        /**
+         * Defaults to 1
+         */
+        @DataMember
+        @ApiMember(Description="Defaults to 1", ParameterType="query")
+        public Integer page = null;
+
+        /**
+         * Defaults to 25
+         */
+        @DataMember
+        @ApiMember(Description="Defaults to 25", ParameterType="query")
+        public Integer page_size = null;
+
+        @DataMember
+        @ApiMember(ParameterType="query")
+        public String start_date = null;
+
+        @DataMember
+        @ApiMember(ParameterType="query")
+        public String end_date = null;
+
+        @DataMember
+        @ApiMember(ParameterType="query")
+        public ArrayList<String> completion_states = null;
+
+        public String getAppId() { return app_id; }
+        public GetEvents setAppId(String value) { this.app_id = value; return this; }
+        public Integer getPage() { return page; }
+        public GetEvents setPage(Integer value) { this.page = value; return this; }
+        public Integer getPageSize() { return page_size; }
+        public GetEvents setPageSize(Integer value) { this.page_size = value; return this; }
+        public String getStartDate() { return start_date; }
+        public GetEvents setStartDate(String value) { this.start_date = value; return this; }
+        public String getEndDate() { return end_date; }
+        public GetEvents setEndDate(String value) { this.end_date = value; return this; }
+        public ArrayList<String> getCompletionStates() { return completion_states; }
+        public GetEvents setCompletionStates(ArrayList<String> value) { this.completion_states = value; return this; }
+        private static Object responseType = GetEventsResponse.class;
+        public Object getResponseType() { return responseType; }
+    }
+
+    @Route(Path="/entities", Verbs="DELETE")
+    @DataContract
+    public static class ClearEntities implements IReturn<ClearEntitiesResponse>
+    {
+        @DataMember
+        public ArrayList<UUID> app_ids = null;
+
+        @DataMember
+        public Boolean clear_social = null;
+
+        public ArrayList<UUID> getAppIds() { return app_ids; }
+        public ClearEntities setAppIds(ArrayList<UUID> value) { this.app_ids = value; return this; }
+        public Boolean isClearSocial() { return clear_social; }
+        public ClearEntities setClearSocial(Boolean value) { this.clear_social = value; return this; }
+        private static Object responseType = ClearEntitiesResponse.class;
+        public Object getResponseType() { return responseType; }
+    }
+
+    @Route(Path="/session", Verbs="POST")
+    @DataContract
+    public static class SetDelegatedIdPxSession implements IReturn<SetDelegatedIdPxSessionResponse>, IAppId
+    {
+        @DataMember
+        public String app_id = null;
+
+        @DataMember
+        public String session_token = null;
+
+        public String getAppId() { return app_id; }
+        public SetDelegatedIdPxSession setAppId(String value) { this.app_id = value; return this; }
+        public String getSessionToken() { return session_token; }
+        public SetDelegatedIdPxSession setSessionToken(String value) { this.session_token = value; return this; }
+        private static Object responseType = SetDelegatedIdPxSessionResponse.class;
         public Object getResponseType() { return responseType; }
     }
 
@@ -201,10 +287,13 @@ public class dtos
         public String client_data = null;
 
         @DataMember
-        public String client_encryption_key = null;
+        public ArrayList<Tag> tags = null;
 
         @DataMember
-        public ArrayList<Tag> tags = null;
+        public String destination_url = null;
+
+        @DataMember
+        public String callback_url = null;
 
         public String getAppId() { return app_id; }
         public StartLogin setAppId(String value) { this.app_id = value; return this; }
@@ -216,15 +305,17 @@ public class dtos
         public StartLogin setEmailAddress(String value) { this.email_address = value; return this; }
         public String getClientData() { return client_data; }
         public StartLogin setClientData(String value) { this.client_data = value; return this; }
-        public String getClientEncryptionKey() { return client_encryption_key; }
-        public StartLogin setClientEncryptionKey(String value) { this.client_encryption_key = value; return this; }
         public ArrayList<Tag> getTags() { return tags; }
         public StartLogin setTags(ArrayList<Tag> value) { this.tags = value; return this; }
+        public String getDestinationUrl() { return destination_url; }
+        public StartLogin setDestinationUrl(String value) { this.destination_url = value; return this; }
+        public String getCallbackUrl() { return callback_url; }
+        public StartLogin setCallbackUrl(String value) { this.callback_url = value; return this; }
         private static Object responseType = StartLoginResponse.class;
         public Object getResponseType() { return responseType; }
     }
 
-    @Route(Path="/event/{event_id}", Verbs="PUT")
+    @Route(Path="/events/{event_id}", Verbs="PUT")
     @DataContract
     public static class UpdateEvent implements IReturn<UpdateEventResponse>, IAppId
     {
@@ -270,12 +361,18 @@ public class dtos
         public Object getResponseType() { return responseType; }
     }
 
-    public static class CallbackResponse implements IBaseResponse
+    @Route(Path="/session", Verbs="DELETE")
+    @DataContract
+    public static class LogoutDelegatedIdPxSession implements IReturn<LogoutDelegatedIdPxSessionResponse>, IAppId
     {
-        public IErrorResponse error = null;
+        @DataMember
+        @ApiMember(ParameterType="query")
+        public String app_id = null;
 
-        public IErrorResponse getError() { return error; }
-        public CallbackResponse setError(IErrorResponse value) { this.error = value; return this; }
+        public String getAppId() { return app_id; }
+        public LogoutDelegatedIdPxSession setAppId(String value) { this.app_id = value; return this; }
+        private static Object responseType = LogoutDelegatedIdPxSessionResponse.class;
+        public Object getResponseType() { return responseType; }
     }
 
     public static class CreateEventResponse implements IBaseResponse
@@ -306,6 +403,50 @@ public class dtos
         public CreateEventResponse setError(IErrorResponse value) { this.error = value; return this; }
     }
 
+    public static class GetEventsResponse implements IBaseResponse
+    {
+        @DataMember
+        public IErrorResponse error = null;
+
+        @DataMember
+        public Integer total_items = null;
+
+        @DataMember
+        public Integer total_pages = null;
+
+        @DataMember
+        public ArrayList<Event> events = null;
+
+        public IErrorResponse getError() { return error; }
+        public GetEventsResponse setError(IErrorResponse value) { this.error = value; return this; }
+        public Integer getTotalItems() { return total_items; }
+        public GetEventsResponse setTotalItems(Integer value) { this.total_items = value; return this; }
+        public Integer getTotalPages() { return total_pages; }
+        public GetEventsResponse setTotalPages(Integer value) { this.total_pages = value; return this; }
+        public ArrayList<Event> getEvents() { return events; }
+        public GetEventsResponse setEvents(ArrayList<Event> value) { this.events = value; return this; }
+    }
+
+    @DataContract
+    public static class ClearEntitiesResponse implements IBaseResponse
+    {
+        @DataMember
+        public IErrorResponse error = null;
+
+        public IErrorResponse getError() { return error; }
+        public ClearEntitiesResponse setError(IErrorResponse value) { this.error = value; return this; }
+    }
+
+    @DataContract
+    public static class SetDelegatedIdPxSessionResponse implements IBaseResponse
+    {
+        @DataMember
+        public IErrorResponse error = null;
+
+        public IErrorResponse getError() { return error; }
+        public SetDelegatedIdPxSessionResponse setError(IErrorResponse value) { this.error = value; return this; }
+    }
+
     public static class PingResponse implements IBaseResponse
     {
         @DataMember
@@ -322,7 +463,7 @@ public class dtos
     public static class GetProvidersResponse implements IBaseResponse
     {
         @DataMember
-        public ArrayList<Provider> identity_providers = null;
+        public ArrayList<Provider> social_identity_providers = null;
 
         @DataMember
         public ArrayList<EnterpriseProvider> enterprise_identity_providers = null;
@@ -332,8 +473,8 @@ public class dtos
 
         public IErrorResponse error = null;
 
-        public ArrayList<Provider> getIdentityProviders() { return identity_providers; }
-        public GetProvidersResponse setIdentityProviders(ArrayList<Provider> value) { this.identity_providers = value; return this; }
+        public ArrayList<Provider> getSocialIdentityProviders() { return social_identity_providers; }
+        public GetProvidersResponse setSocialIdentityProviders(ArrayList<Provider> value) { this.social_identity_providers = value; return this; }
         public ArrayList<EnterpriseProvider> getEnterpriseIdentityProviders() { return enterprise_identity_providers; }
         public GetProvidersResponse setEnterpriseIdentityProviders(ArrayList<EnterpriseProvider> value) { this.enterprise_identity_providers = value; return this; }
         public String getSuggestedIdentityProvider() { return suggested_identity_provider; }
@@ -397,10 +538,10 @@ public class dtos
         public String client_data = null;
 
         @DataMember
-        public String client_encryption_key = null;
+        public String event_id = null;
 
         @DataMember
-        public String event_id = null;
+        public String destination_url = null;
 
         public IErrorResponse error = null;
 
@@ -420,23 +561,22 @@ public class dtos
         public ValidateLoginResponse setIdentityProviderData(IdentityProviderData value) { this.identity_provider_data = value; return this; }
         public String getClientData() { return client_data; }
         public ValidateLoginResponse setClientData(String value) { this.client_data = value; return this; }
-        public String getClientEncryptionKey() { return client_encryption_key; }
-        public ValidateLoginResponse setClientEncryptionKey(String value) { this.client_encryption_key = value; return this; }
         public String getEventId() { return event_id; }
         public ValidateLoginResponse setEventId(String value) { this.event_id = value; return this; }
+        public String getDestinationUrl() { return destination_url; }
+        public ValidateLoginResponse setDestinationUrl(String value) { this.destination_url = value; return this; }
         public IErrorResponse getError() { return error; }
         public ValidateLoginResponse setError(IErrorResponse value) { this.error = value; return this; }
     }
 
-    public static interface IErrorResponse
+    @DataContract
+    public static class LogoutDelegatedIdPxSessionResponse implements IBaseResponse
     {
-        public String code = null;
-        public String message = null;
-    }
-
-    public static interface IBaseResponse
-    {
+        @DataMember
         public IErrorResponse error = null;
+
+        public IErrorResponse getError() { return error; }
+        public LogoutDelegatedIdPxSessionResponse setError(IErrorResponse value) { this.error = value; return this; }
     }
 
     @DataContract
@@ -462,10 +602,7 @@ public class dtos
     public static class ValidationDetails
     {
         @DataMember
-        public String auth_validation = null;
-
-        @DataMember
-        public String email_match_validation = null;
+        public String domain_validation = null;
 
         @DataMember
         public String ip_validation = null;
@@ -476,10 +613,8 @@ public class dtos
         @DataMember
         public String time_validation = null;
 
-        public String getAuthValidation() { return auth_validation; }
-        public ValidationDetails setAuthValidation(String value) { this.auth_validation = value; return this; }
-        public String getEmailMatchValidation() { return email_match_validation; }
-        public ValidationDetails setEmailMatchValidation(String value) { this.email_match_validation = value; return this; }
+        public String getDomainValidation() { return domain_validation; }
+        public ValidationDetails setDomainValidation(String value) { this.domain_validation = value; return this; }
         public String getIpValidation() { return ip_validation; }
         public ValidationDetails setIpValidation(String value) { this.ip_validation = value; return this; }
         public String getGeoValidation() { return geo_validation; }
@@ -512,6 +647,111 @@ public class dtos
         public LocationDetails setCountryName(String value) { this.country_name = value; return this; }
     }
 
+    public static interface IErrorResponse
+    {
+        public String code = null;
+        public String message = null;
+    }
+
+    public static interface IBaseResponse
+    {
+        public IErrorResponse error = null;
+    }
+
+    public static class Event
+    {
+        @DataMember
+        public Date created_date = null;
+
+        @DataMember
+        public String event_type = null;
+
+        @DataMember
+        public String completion_state = null;
+
+        @DataMember
+        public String email_address = null;
+
+        @DataMember
+        public String provider_type = null;
+
+        @DataMember
+        public String ip_address = null;
+
+        @DataMember
+        public Boolean event_success = null;
+
+        @DataMember
+        public String local_success = null;
+
+        @DataMember
+        public Date local_success_date = null;
+
+        @DataMember
+        public ValidationDetails validation_details = null;
+
+        @DataMember
+        public String country_code = null;
+
+        @DataMember
+        public String latitude = null;
+
+        @DataMember
+        public String longitude = null;
+
+        @DataMember
+        public ArrayList<Tag> tags = null;
+
+        @DataMember
+        public String operating_system = null;
+
+        @DataMember
+        public String browser = null;
+
+        @DataMember
+        public String device = null;
+
+        @DataMember
+        public Boolean is_bot = null;
+
+        public Date getCreatedDate() { return created_date; }
+        public Event setCreatedDate(Date value) { this.created_date = value; return this; }
+        public String getEventType() { return event_type; }
+        public Event setEventType(String value) { this.event_type = value; return this; }
+        public String getCompletionState() { return completion_state; }
+        public Event setCompletionState(String value) { this.completion_state = value; return this; }
+        public String getEmailAddress() { return email_address; }
+        public Event setEmailAddress(String value) { this.email_address = value; return this; }
+        public String getProviderType() { return provider_type; }
+        public Event setProviderType(String value) { this.provider_type = value; return this; }
+        public String getIpAddress() { return ip_address; }
+        public Event setIpAddress(String value) { this.ip_address = value; return this; }
+        public Boolean isEventSuccess() { return event_success; }
+        public Event setEventSuccess(Boolean value) { this.event_success = value; return this; }
+        public String getLocalSuccess() { return local_success; }
+        public Event setLocalSuccess(String value) { this.local_success = value; return this; }
+        public Date getLocalSuccessDate() { return local_success_date; }
+        public Event setLocalSuccessDate(Date value) { this.local_success_date = value; return this; }
+        public ValidationDetails getValidationDetails() { return validation_details; }
+        public Event setValidationDetails(ValidationDetails value) { this.validation_details = value; return this; }
+        public String getCountryCode() { return country_code; }
+        public Event setCountryCode(String value) { this.country_code = value; return this; }
+        public String getLatitude() { return latitude; }
+        public Event setLatitude(String value) { this.latitude = value; return this; }
+        public String getLongitude() { return longitude; }
+        public Event setLongitude(String value) { this.longitude = value; return this; }
+        public ArrayList<Tag> getTags() { return tags; }
+        public Event setTags(ArrayList<Tag> value) { this.tags = value; return this; }
+        public String getOperatingSystem() { return operating_system; }
+        public Event setOperatingSystem(String value) { this.operating_system = value; return this; }
+        public String getBrowser() { return browser; }
+        public Event setBrowser(String value) { this.browser = value; return this; }
+        public String getDevice() { return device; }
+        public Event setDevice(String value) { this.device = value; return this; }
+        public Boolean getIsBot() { return is_bot; }
+        public Event setIsBot(Boolean value) { this.is_bot = value; return this; }
+    }
+
     public static class Provider
     {
         @DataMember
@@ -532,12 +772,32 @@ public class dtos
         @DataMember
         public String type = null;
 
+        @DataMember
+        public String login_button_image_uri = null;
+
+        @DataMember
+        public String login_background_hex_color = null;
+
+        @DataMember
+        public String login_icon_image_uri = null;
+
+        @DataMember
+        public String login_text_hex_color = null;
+
         public String getName() { return name; }
         public EnterpriseProvider setName(String value) { this.name = value; return this; }
         public String getIdentityProviderId() { return identity_provider_id; }
         public EnterpriseProvider setIdentityProviderId(String value) { this.identity_provider_id = value; return this; }
         public String getType() { return type; }
         public EnterpriseProvider setType(String value) { this.type = value; return this; }
+        public String getLoginButtonImageUri() { return login_button_image_uri; }
+        public EnterpriseProvider setLoginButtonImageUri(String value) { this.login_button_image_uri = value; return this; }
+        public String getLoginBackgroundHexColor() { return login_background_hex_color; }
+        public EnterpriseProvider setLoginBackgroundHexColor(String value) { this.login_background_hex_color = value; return this; }
+        public String getLoginIconImageUri() { return login_icon_image_uri; }
+        public EnterpriseProvider setLoginIconImageUri(String value) { this.login_icon_image_uri = value; return this; }
+        public String getLoginTextHexColor() { return login_text_hex_color; }
+        public EnterpriseProvider setLoginTextHexColor(String value) { this.login_text_hex_color = value; return this; }
     }
 
     public static class IdentityProviderData

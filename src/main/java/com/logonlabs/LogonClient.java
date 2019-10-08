@@ -125,12 +125,13 @@ public class LogonClient {
      * @param identityProviderId    the unique identifier for the identity provider. if this is passed then identityProvider parameter must be null
      * @param emailAddress          required if matching the email against the one returned by the identity provider
      * @param clientData            any custom data required by your application.  will be present in client_data of the ValidateLoginResponse
-     * @param clientEncryptionKey   optional key client/server can set to encrypt/decrypt sensitive information passed between the two
+     * @param destinationUrl        used to inform the back end which client to return the login to.  mainly used for mobile workflows
+     * @param callbackUrl           used to determine which server endpoint to return the user to.  useful when supporting different backend solutions
      * @param tags                  any custom information required for viewing the event logs
      * @return                      token to pass to validateLogin in order to continue the current SSO login process
      * @throws LogonLabsException   thrown in case of API error
      */
-    public String startLogin(String identityProvider, String identityProviderId, String emailAddress, String clientData, String clientEncryptionKey, ArrayList<dtos.Tag> tags) throws LogonLabsException {
+    public String startLogin(String identityProvider, String identityProviderId, String emailAddress, String clientData, String destinationUrl, String callbackUrl, ArrayList<dtos.Tag> tags) throws LogonLabsException {
         try {
 
             dtos.StartLogin request = new dtos.StartLogin();
@@ -151,8 +152,10 @@ public class LogonClient {
             request.setIdentityProviderId(identityProviderId);
             request.setEmailAddress(emailAddress);
             request.setClientData(clientData);
-            request.setClientEncryptionKey(clientEncryptionKey);
+            //request.setClientEncryptionKey(clientEncryptionKey);
             request.setTags(tags);
+            request.setDestinationUrl(destinationUrl);
+            request.setCallbackUrl(callbackUrl);
 
             dtos.StartLoginResponse response = client.post(request);
 

@@ -40,7 +40,7 @@ public class LogonClientTest {
 
         LogonClient client = new LogonClient(APP_ID, APP_SECRET, IDPX_URI);
 
-        String response = client.startLogin(IdentityProviders.Microsoft, null,"isiah.pasquale@deliveryslip.com", null, null, null);
+        String response = client.startLogin(IdentityProviders.Microsoft, null,"isiah.pasquale@deliveryslip.com", null, null, null, null);
         if(response == null || response.isEmpty()) {
             throw new Exception("failed to get uri");
         }
@@ -54,17 +54,13 @@ public class LogonClientTest {
 
         if(!response.isEventSuccess()){
             dtos.ValidationDetails validationDetails = response.getValidationDetails();
-            if(!validationDetails.getAuthValidation().equals(EventValidationTypes.Pass)){
-                //authentication with identity provider failed
+            if(validationDetails.getDomainValidation().equals(EventValidationTypes.Fail)){
+                //authentication with correct identity provider for domain failed
                 throw new Exception("auth failed");
             }
-            if(!validationDetails.getEmailMatchValidation().equals(EventValidationTypes.Pass)){
-                //email didn't match the one provided to StartLogin
-                throw new Exception("email match failed");
-            }
-            if(!validationDetails.getGeoValidation().equals(EventValidationTypes.Pass)
-                    || !validationDetails.getIpValidation().equals(EventValidationTypes.Pass)
-                    || !validationDetails.getTimeValidation().equals(EventValidationTypes.Pass)) {
+            if(validationDetails.getGeoValidation().equals(EventValidationTypes.Fail)
+                    || validationDetails.getIpValidation().equals(EventValidationTypes.Fail)
+                    || validationDetails.getTimeValidation().equals(EventValidationTypes.Fail)) {
                 //validation failed via restriction settings for the app
                 throw new Exception("validation failed");
             }
