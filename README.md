@@ -9,7 +9,7 @@ Maven
 <dependency>
     <groupId>com.logonlabs</groupId>
     <artifactId>logonlabs-java</artifactId>
-    <version>1.0</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 
@@ -54,8 +54,6 @@ String queryToken = client.parseToken(callbackUrl);
 
 ValidateLoginResponse response = client.validateLogin(queryToken);
 
-String eventId = response.getEventId(); //used to update the SSO event later via UpdateEvent
-
 if(response.isEventSuccess()) {
     //authentication and validation succeeded. proceed with post-auth workflows for your system
     
@@ -75,7 +73,6 @@ import com.logonlabs.dtos.Tag;
 
 //optional parameters
 String clientData = "{\"ClientData\":\"Value\"}";
-String clientEncryptionKey = "qbTRzCvUju";
 ArrayList<Tag> tags = new ArrayList<Tag>();
 Tag tag = new Tag();
 tag.setKey("example-key");
@@ -83,7 +80,7 @@ tag.setValue("example-value");
 tags.Add(tag);
 //
 
-String redirectUri = client.startLogin(IdentityProviders.Google, "emailAddress", clientData, clientEncryptionKey, tags);
+String redirectUri = client.startLogin(IdentityProviders.Google, "example@emailaddress.com", clientData, clientEncryptionKey, tags);
 ```
 The `redirectUri` property returned should be redirected to by the application.  Upon submitting their credentials, users will be redirected to the `CallbackUrl` set within the application settings at https://app.logonlabs.com/app/#/app-settings.
 &nbsp;
@@ -109,13 +106,9 @@ if(response.isEventSuccess()) {
 } else {
     //some validations failed.  details contained in SsoValidationDetails object.
 
-    ValidationDetails validationDetails = response.getValidationDetails();
-    if(validationDetails.getAuthValidation().equals(EventValidationTypes.Fail)) {
-        //authentication with identity provider failed
-    }
-    if(validationDetails.getEmailMatchValidation().equals(EventValidationTypes.Fail)) {
-        //email didn't match the one provided to StartLogin
-    }
+    if(validationDetails.getDomainValidation().equals(EventValidationTypes.Fail)) {
+        //provider used was not enabled for the domain of the user that was authenticated
+    }   
     if(validationDetails.getGeoValidation().equals(EventValidationTypes.Fail) 
         || validationDetails.getIpValidation().equals(EventValidationTypes.Fail) 
         || validationDetails.getTimeValidation().equals(EventValidationTypes.Fail)) {
@@ -143,28 +136,15 @@ tags.Add(tag);
 String localValidation = EventValidationTypes.Pass;
 
 CreateEventResponse response = client.createEvent(EventTypes.LocalLogin, validateEvent, 
-                                    "ipAddress", "emailAddress", "firstName", "lastName", 
-                                    localValidation, "userAgent", tags);
+                                    "{IP_ADDRESS}", "{EMAIL_ADDRESS}", "{FIRST_NAME}", "{LAST_NAME}", 
+                                    localValidation, "{USER_AGENT}", tags);
 
-String eventId = response.getEventId();
-
-//some later local validation fails which requires further updates to the event...
-
-localValidation = EventValidationTypes.Fail;
-tags = new ArrayList<Tag>();
-tag = new Tag();
-tag.setKey("failure-field");
-tag.setValue("detailed reason for failure");
-tags.Add(tag);
-
-client.updateEvent(eventId, localValidation, tags);
 ```
 
 ---
 ### Helper Methods
 #### GetProviders
-This method is used to retrieve a list of all providers enabled for the application.
-If an email address is passed to the method, it will return the list of providers available for that email domain.
+This method is used to retrieve a list of all providers enabled for the application. If an email address is passed it will further filter any providers available/disabled for the domain of the address.
 If any Enterprise Identity Providers have been configured a separate set of matching providers will also be returned in enterprise_identity_providers.
 
 ```java
@@ -173,31 +153,16 @@ import com.logonlabs.dtos.GetProvidersResponse;
 import com.logonlabs.dtos.Provider;
 import com.logonlabs.constants.IdentityProviders;
 
-GetProvidersResponse response = client.getProviders("emailAddress");
+GetProvidersResponse response = client.getProviders("example@emailaddress.com");
 
-for(Provider provider : response.identity_providers) {
+for(Provider provider : response.social_identity_providers) {
 
-    if(provider.getType().equals(IdentityProviders.Google)) {
-        //make google available in UI or handle other custom rules
-    }
+    //each individual provider available for this app / email address
 }
 
 for(EnterpriseProvider provider : response.enterprise_identity_providers) {
-        //use the identity_provider_id to find the correct provider and apply any custom rules
+        //each enterprise provider available for this app / email address
     }
-```
-
-#### Encrypt/Decrypt
-The Java SDK has built in methods for encrypting/decrypting strings using AES encryption.  Use a value for your encryption key that only your client/server will know. 
-```java
-import com.logonlabs.LogonClient;
-
-String baseString = "string to be encrypted";
-String encryptionKey = "qbTRzCvUju";
-
-String encryptedString = client.encrypt(encryptionKey, baseString);
-
-String decryptedString = client.decrypt(encryptionKey, encryptedString);
 ```
 
 #### ParseToken

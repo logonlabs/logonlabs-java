@@ -24,18 +24,6 @@ public class LogonClientTest {
     }
 
     @Test
-    public void encryptDecryptTest() throws Exception {
-        LogonClient client = new LogonClient(APP_ID, APP_SECRET, IDPX_URI);
-        String valueToEncrypt = "logonlabs";
-        String encrypted = client.encrypt(CLIENT_ENCRYPTION_SECRET, valueToEncrypt);
-        String decrypted = client.decrypt(CLIENT_ENCRYPTION_SECRET, encrypted);
-
-        if(!valueToEncrypt.equalsIgnoreCase(decrypted)){
-            throw new Exception("Failed to encrypt/decrypt string");
-        }
-    }
-
-    @Test
     public void startLoginTest() throws Exception {
 
         LogonClient client = new LogonClient(APP_ID, APP_SECRET, IDPX_URI);

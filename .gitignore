@@ -130,3 +130,8 @@ gradle-app.setting
 **/build/
 
 # End of https://www.gitignore.io/api/java,gradle,intellij
+.idea/vcs.xml
+.idea/misc.xml
+.idea/encodings.xml
+.idea/artifacts/com_logonlabs_logonlabs_java_main_jar.xml
+.idea/logonlabs-java.iml

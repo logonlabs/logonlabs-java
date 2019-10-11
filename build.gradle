@@ -39,7 +39,7 @@ artifacts {
 // IDs
 group 'com.logonlabs'
 archivesBaseName = "logonlabs-java"
-version '1.0'
+version '1.5.0'
 sourceCompatibility = 1.8
 
 // Build, sign, and upload

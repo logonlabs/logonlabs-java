@@ -262,78 +262,6 @@ public class LogonClient {
         }
     }
 
-
-    /**
-     * Method used to encrypt data that needs to be sent from the user's front and back ends
-     * @param clientEncryptionKey key used to encrypt the data
-     * @param value the data to be encrypted
-     * @return the encrypted data
-     */
-    public String encrypt(String clientEncryptionKey, String value) {
-        try
-        {
-            String cipherMethod =  "AES/CBC/PKCS5Padding";
-            byte[] salt = getRandomBytes(32);
-            SecretKeySpec secretKey = getSecretKey(clientEncryptionKey, salt);
-
-            //IV
-            byte[] iv = getRandomBytes(16);
-            IvParameterSpec ivspec = new IvParameterSpec(iv);
-
-            //encryption
-            Cipher ci = Cipher.getInstance(cipherMethod);
-            ci.init(Cipher.ENCRYPT_MODE, secretKey, ivspec);
-            byte[] encrypted = ci.doFinal(value.getBytes(StandardCharsets.UTF_8));
-
-            //export
-            byte[] combinedIvSaltCt = new byte[salt.length + iv.length + encrypted.length];
-            System.arraycopy(salt, 0, combinedIvSaltCt, 0, salt.length);
-            System.arraycopy(iv, 0, combinedIvSaltCt, salt.length, iv.length);
-            System.arraycopy(encrypted, 0, combinedIvSaltCt, salt.length + iv.length, encrypted.length);
-
-            return Base64.getEncoder().encodeToString(combinedIvSaltCt);
-        }
-        catch (Exception e)
-        {
-            System.out.println("Error while encrypting: " + e.toString());
-        }
-        return null;
-    }
-
-    /**
-     * Method used to decrypt data that needs to be sent from the user's front and back ends
-     * @param clientEncryptionKey key used to decrypt the data
-     * @param encryptedValue the data to be decrypted
-     * @return the decrypted data
-     */
-    public String decrypt(String clientEncryptionKey, String encryptedValue) {
-        try
-        {
-            String cipherMethod =  "AES/CBC/PKCS5Padding";
-            byte[] salt = new byte[32];
-            byte[] iv = new byte[16];
-            byte[] encrypted = new byte[16];
-
-            byte[] inputAsByteArray = Base64.getDecoder().decode(encryptedValue);
-
-            System.arraycopy(inputAsByteArray, 0, salt, 0, salt.length);
-            System.arraycopy(inputAsByteArray, salt.length, iv, 0, iv.length);
-            System.arraycopy(inputAsByteArray, salt.length + iv.length, encrypted, 0, encrypted.length);
-
-            SecretKeySpec secretKey = getSecretKey(clientEncryptionKey, salt);
-            Cipher ci = Cipher.getInstance(cipherMethod);
-            ci.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
-
-            byte[] decryptedBytes = ci.doFinal(encrypted);
-            return new String(decryptedBytes, StandardCharsets.UTF_8);
-        }
-        catch (Exception e)
-        {
-            System.out.println("Error while decrypting: " + e.toString());
-        }
-        return null;
-    }
-
     public String parseToken(String url) throws MalformedURLException, URIException {
         if(url == null || url.isEmpty()){
             throw new IllegalArgumentException("url must have value");
@@ -353,22 +281,6 @@ public class LogonClient {
         }
 
         throw new IllegalArgumentException(String.format("url %s is missing a token parameter in query string", url));
-    }
-
-    private SecretKeySpec getSecretKey(String clientEncryptionKey, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String hashMethod = "PBKDF2WithHmacSHA256";
-        SecretKeyFactory factory = SecretKeyFactory.getInstance(hashMethod);
-        int iterations = 1000;
-        KeySpec spec = new PBEKeySpec(clientEncryptionKey.toCharArray(), salt, iterations, 256);
-        SecretKey tmp = factory.generateSecret(spec);
-        return new SecretKeySpec(tmp.getEncoded(), "AES");
-    }
-
-    private byte[] getRandomBytes(int length) {
-        Random r = new SecureRandom();
-        byte[] salt = new byte[length];
-        r.nextBytes(salt);
-        return salt;
     }
 
     private void throwIfNoSecret()
