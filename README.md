@@ -135,9 +135,16 @@ tag.setValue("example-value");
 tags.Add(tag);
 String localValidation = EventValidationTypes.Pass;
 
-CreateEventResponse response = client.createEvent(EventTypes.LocalLogin, validateEvent, 
-                                    "{IP_ADDRESS}", "{EMAIL_ADDRESS}", "{FIRST_NAME}", "{LAST_NAME}", 
-                                    localValidation, "{USER_AGENT}", tags);
+CreateEventResponse response = client.createEvent(
+    EventTypes.LocalLogin, 
+    validateEvent, 
+    "{IP_ADDRESS}", 
+    "{EMAIL_ADDRESS}", 
+    "{FIRST_NAME}", 
+    "{LAST_NAME}", 
+    localValidation, 
+    "{USER_AGENT}", 
+    tags);
 
 ```
 
