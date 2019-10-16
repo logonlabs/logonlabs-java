@@ -52,19 +52,23 @@ String callbackUrl = "{CallbackUrl}?token=4033d32b8e334f80af6a3e627b66e640";
 
 String queryToken = client.parseToken(callbackUrl);
 
-ValidateLoginResponse response = client.validateLogin(queryToken);
+try {
 
-if(response.isEventSuccess()) {
-    //authentication and validation succeeded. proceed with post-auth workflows for your system
+    ValidateLoginResponse response = client.validateLogin(queryToken);
     
+    if(response.isEventSuccess()) {
+        //authentication and validation succeeded. proceed with post-auth workflows for your system
+        
+    }
+} catch(LogonLabsException ex) {
+    System.out.println(ex.getMessage());
 }
-
 ```
 ---
 ### Java Only Workflow
 The following workflow is required if you're using a java framework that handles both the front and back ends.  If this does not apply to you, please refer to the SSO Login QuickStart section.
 #### Step 1 - StartLogin
-This call begins the LogonLabs managed SSO process.  The `clientData` property is optional and is used to pass any data that is required after validating the request.  The `clientEncryptionKey` property is optionally passed if the application requires encrypting any data that is passed between the front and back end infrastructure. The `tags`property is an ArrayList of type Tag which is a simple object representing a key/value pair.
+This call begins the LogonLabs managed SSO process.  The `clientData` property is optional and is used to pass any data that is required after validating the request.  The `tags`property is an ArrayList of type Tag which is a simple object representing a key/value pair.
 
 ```java
 import com.logonlabs.LogonClient;
@@ -78,45 +82,50 @@ Tag tag = new Tag();
 tag.setKey("example-key");
 tag.setValue("example-value");
 tags.Add(tag);
-//
 
-String redirectUri = client.startLogin(IdentityProviders.Google, "example@emailaddress.com", clientData, clientEncryptionKey, tags);
+try {
+    String redirectUri = client.startLogin(IdentityProviders.Google, null, "example@emailaddress.com", clientData, null, null, tags);
+} catch (LogonLabsException ex) {
+    System.out.println(ex.getMessage());
+}
 ```
 The `redirectUri` property returned should be redirected to by the application.  Upon submitting their credentials, users will be redirected to the `CallbackUrl` set within the application settings at https://app.logonlabs.com/app/#/app-settings.
 &nbsp;
 #### Step 2 - ValidateLogin
 This method is used to validate the results of the login attempt.  `queryToken` corresponds to the query parameter with the name `token` appended to the callback url specified for your app.
 
-The response contains all details of the login and the user has now completed the SSO workflow.  If there is any additional information to add, UpdateEvent can be called on the `eventId` returned.
+The response contains all details of the login and the user has now completed the SSO workflow.
 ```java
 import com.logonlabs.LogonClient;
 import com.logonlabs.dtos.ValidateLoginResponse;
 import com.logonlabs.dtos.SsoValidationDetails;
 
-String callbackUrl = "{CallbackUrl}?token=4033d32b8e334f80af6a3e627b66e640";
+String callbackUrl = "{CallbackUrl}?token={TOKEN}";
 String queryToken = client.parseToken(callbackUrl);
+try {
 
-ValidateLoginResponse response = client.validateLogin(queryToken);
-
-String eventId = response.getEventId();
-
-if(response.isEventSuccess()) {
-    //authorization with the identity provider succeeded.  proceed with your system's workflows...
+    ValidateLoginResponse response = client.validateLogin(queryToken);
     
-} else {
-    //some validations failed.  details contained in SsoValidationDetails object.
-
-    if(validationDetails.getDomainValidation().equals(EventValidationTypes.Fail)) {
-        //provider used was not enabled for the domain of the user that was authenticated
-    }   
-    if(validationDetails.getGeoValidation().equals(EventValidationTypes.Fail) 
-        || validationDetails.getIpValidation().equals(EventValidationTypes.Fail) 
-        || validationDetails.getTimeValidation().equals(EventValidationTypes.Fail)) {
-        //validation failed via restriction settings for the app
+    if(response.isEventSuccess()) {
+        //authorization with the identity provider succeeded.  proceed with your system's workflows...
+        
+    } else {
+        //some validations failed.  details contained in SsoValidationDetails object.
+    
+        if(validationDetails.getDomainValidation().equals(EventValidationTypes.Fail)) {
+            //provider used was not enabled for the domain of the user that was authenticated
+        }   
+        if(validationDetails.getGeoValidation().equals(EventValidationTypes.Fail) 
+            || validationDetails.getIpValidation().equals(EventValidationTypes.Fail) 
+            || validationDetails.getTimeValidation().equals(EventValidationTypes.Fail)) {
+            
+            //validation failed via restriction settings for the app
+        }
+    
     }
-
+} catch (LogonLabsException ex) {
+    System.out.println(ex.getMessage());
 }
-
 ```
 ---
 ### Events
@@ -135,17 +144,20 @@ tag.setValue("example-value");
 tags.Add(tag);
 String localValidation = EventValidationTypes.Pass;
 
-CreateEventResponse response = client.createEvent(
-    EventTypes.LocalLogin, 
-    validateEvent, 
-    "{IP_ADDRESS}", 
-    "{EMAIL_ADDRESS}", 
-    "{FIRST_NAME}", 
-    "{LAST_NAME}", 
-    localValidation, 
-    "{USER_AGENT}", 
-    tags);
-
+try {
+    CreateEventResponse response = client.createEvent(
+        EventTypes.LocalLogin, 
+        validateEvent, 
+        "{IP_ADDRESS}", 
+        "{EMAIL_ADDRESS}", 
+        "{FIRST_NAME}", 
+        "{LAST_NAME}", 
+        localValidation, 
+        "{USER_AGENT}", 
+        tags);
+} catch(LogonLabsException ex) {
+    System.out.println(ex.getMessage());
+}
 ```
 
 ---
@@ -160,16 +172,20 @@ import com.logonlabs.dtos.GetProvidersResponse;
 import com.logonlabs.dtos.Provider;
 import com.logonlabs.constants.IdentityProviders;
 
-GetProvidersResponse response = client.getProviders("example@emailaddress.com");
-
-for(Provider provider : response.social_identity_providers) {
-
-    //each individual provider available for this app / email address
-}
-
-for(EnterpriseProvider provider : response.enterprise_identity_providers) {
-        //each enterprise provider available for this app / email address
+try {
+    GetProvidersResponse response = client.getProviders("example@emailaddress.com");
+    
+    for(Provider provider : response.social_identity_providers) {
+    
+        //each individual provider available for this app / email address
     }
+    
+    for(EnterpriseProvider provider : response.enterprise_identity_providers) {
+            //each enterprise provider available for this app / email address
+    }
+} catch(LogonLabsException ex) {
+    System.out.println(ex.getMessage());
+}
 ```
 
 #### ParseToken
